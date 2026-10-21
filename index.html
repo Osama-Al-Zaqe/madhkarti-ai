@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1f6feb" />
+    <meta name="description" content="منصة مذاكرتي AI" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%231f6feb'/%3E%3Ctext x='50' y='58' font-size='52' text-anchor='middle' fill='white'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="styles.css" />
+    <title>مذاكرتي AI</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-icon">📚</div>
+          <div>
+            <div class="brand-name">مذاكرتي AI</div>
+            <div class="brand-sub">خطة دراسية ذكية لطالب الثانوية العامة</div>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button id="themeToggle" class="ghost-btn" type="button">🌙 الوضع الداكن</button>
+          <div id="lastSyncBadge" class="sync-badge">تم الحفظ محليًا</div>
+        </div>
+      </header>
+
+      <nav class="main-nav" aria-label="التنقل الرئيسي">
+        <button class="nav-btn active" data-section="dashboard">لوحة التحكم</button>
+        <button class="nav-btn" data-section="profile">ملفي الدراسي</button>
+        <button class="nav-btn" data-section="curriculum">المناهج</button>
+        <button class="nav-btn" data-section="schedule">الجدول</button>
+        <button class="nav-btn" data-section="calendar">التقويم</button>
+        <button class="nav-btn" data-section="tasks">المهام</button>
+        <button class="nav-btn" data-section="exams">الامتحانات</button>
+        <button class="nav-btn" data-section="focus">المؤقت</button>
+        <button class="nav-btn" data-section="review">المراجعة</button>
+        <button class="nav-btn" data-section="stats">الإحصائيات</button>
+        <button class="nav-btn" data-section="library">المكتبة</button>
+        <button class="nav-btn" data-section="assistant">المساعد</button>
+        <button class="nav-btn" data-section="settings">الإعدادات</button>
+      </nav>
+
+      <main class="main-content">
+        <section id="dashboard" class="page-panel active">
+          <div class="section-header">
+            <h2>لوحة التحكم</h2>
+          </div>
+          <div id="dashboardOverview" class="stats-grid"></div>
+          <div class="dashboard-grid">
+            <div class="card">
+              <h3>خطة مذاكرة اليوم</h3>
+              <div id="todayPlan"></div>
+            </div>
+            <div class="card">
+              <h3>الأهداف</h3>
+              <div id="goalsList"></div>
+            </div>
+            <div class="card">
+              <h3>المهام القادمة</h3>
+              <div id="upcomingTasks"></div>
+            </div>
+            <div class="card">
+              <h3>ملخص التقدم</h3>
+              <div id="dailySummary"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="profile" class="page-panel">
+          <div class="section-header">
+            <h2>ملفي الدراسي</h2>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <h3>بيانات الطالب</h3>
+              <form id="profileForm" class="stack-form">
+                <label>اسم الطالب <input type="text" id="studentName" /></label>
+                <label>السنة الدراسية
+                  <select id="schoolYear">
+                    <option value="2025-2026">2025-2026</option>
+                    <option value="2026-2027">2026-2027</option>
+                    <option value="2027-2028">2027-2028</option>
+                  </select>
+                </label>
+                <label>النظام <input type="text" id="systemName" placeholder="ثانوية عامة / نظام جديد" /></label>
+                <label>الشعبة <input type="text" id="streamName" placeholder="علمي علوم / أدبي / ..." /></label>
+                <button type="submit" class="primary-btn">حفظ الملف</button>
+              </form>
+            </div>
+
+            <div class="card">
+              <h3>المواد المختارة</h3>
+              <form id="subjectSelectionForm" class="stack-form">
+                <label>إضافة مادة
+                  <input type="text" id="customSubject" placeholder="مثال: الجغرافيا" />
+                </label>
+                <button type="submit" class="primary-btn">إضافة مادة</button>
+              </form>
+              <ul id="selectedSubjectsList" class="chip-list"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="curriculum" class="page-panel">
+          <div class="section-header">
+            <h2>إدارة المناهج</h2>
+          </div>
+          <div class="card">
+            <h3>إضافة مادة</h3>
+            <form id="curriculumSubjectForm" class="inline-form">
+              <input id="curriculumSubjectName" type="text" placeholder="اسم المادة" />
+              <input id="curriculumSubjectDescription" type="text" placeholder="وصف مختصر" />
+              <button type="submit" class="primary-btn">إضافة مادة</button>
+            </form>
+          </div>
+          <div id="curriculumList" class="stack-list"></div>
+        </section>
+
+        <section id="schedule" class="page-panel">
+          <div class="section-header">
+            <h2>الجدول اليومي والأسبوعي</h2>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <h3>إعدادات الجدول</h3>
+              <form id="scheduleForm" class="stack-form">
+                <label>وقت الاستيقاظ <input type="time" id="wakeTime" /></label>
+                <label>وقت النوم <input type="time" id="sleepTime" /></label>
+                <label>الوقت المتاح يوميًا (دقيقة) <input type="number" id="dailyMinutes" min="30" max="720" /></label>
+                <label>عدد ساعات المذاكرة الهدف <input type="number" id="targetHours" min="1" max="15" /></label>
+                <button type="submit" class="primary-btn">حفظ الإعدادات</button>
+              </form>
+              <button id="generateScheduleBtn" class="secondary-btn" type="button">إنشاء خطة تلقائية</button>
+            </div>
+
+            <div class="card">
+              <h3>إضافة مهمة جدول</h3>
+              <form id="manualTaskForm" class="stack-form">
+                <label>اسم المادة <input type="text" id="scheduleSubject" /></label>
+                <label>العنوان <input type="text" id="scheduleTitle" /></label>
+                <label>نوع المهمة
+                  <select id="scheduleType">
+                    <option value="مذاكرة جديدة">مذاكرة جديدة</option>
+                    <option value="حل أسئلة">حل أسئلة</option>
+                    <option value="مراجعة">مراجعة</option>
+                    <option value="اختبار">اختبار</option>
+                    <option value="تعويض">تعويض</option>
+                  </select>
+                </label>
+                <label>تاريخ / وقت <input type="datetime-local" id="scheduleDate" /></label>
+                <label>المدة (دقيقة) <input type="number" id="scheduleDuration" min="15" max="240" value="45" /></label>
+                <button type="submit" class="primary-btn">إضافة للمجدول</button>
+              </form>
+            </div>
+          </div>
+          <div id="scheduleList" class="stack-list"></div>
+        </section>
+
+        <section id="calendar" class="page-panel">
+          <div class="section-header">
+            <h2>التقويم والمفكرة</h2>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <h3>إضافة حدث / ملاحظة</h3>
+              <form id="calendarForm" class="stack-form">
+                <label>العنوان <input type="text" id="eventTitle" /></label>
+                <label>التاريخ <input type="date" id="eventDate" /></label>
+                <label>النوع
+                  <select id="eventType">
+                    <option value="event">حدث</option>
+                    <option value="task">مهمة</option>
+                    <option value="note">ملاحظة</option>
+                  </select>
+                </label>
+                <label>الوصف <textarea id="eventDescription" rows="3"></textarea></label>
+                <button type="submit" class="primary-btn">حفظ</button>
+              </form>
+            </div>
+            <div class="card">
+              <h3>الملاحظات اليومية</h3>
+              <div id="calendarNotes"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tasks" class="page-panel">
+          <div class="section-header">
+            <h2>مدير المهام</h2>
+          </div>
+          <div class="card">
+            <form id="taskForm" class="stack-form">
+              <label>عنوان المهمة <input type="text" id="taskTitle" /></label>
+              <label>المادة <input type="text" id="taskSubject" /></label>
+              <label>الأولوية
+                <select id="taskPriority">
+                  <option value="عالية">عالية</option>
+                  <option value="متوسطة" selected>متوسطة</option>
+                  <option value="منخفضة">منخفضة</option>
+                </select>
+              </label>
+              <label>تاريخ الاستحقاق <input type="date" id="taskDueDate" /></label>
+              <label>وصف المهمة <textarea id="taskDescription" rows="2"></textarea></label>
+              <button type="submit" class="primary-btn">إضافة مهمة</button>
+            </form>
+          </div>
+          <div id="taskList" class="stack-list"></div>
+        </section>
+
+        <section id="exams" class="page-panel">
+          <div class="section-header">
+            <h2>الامتحانات والاختبارات</h2>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <h3>إضافة امتحان</h3>
+              <form id="examForm" class="stack-form">
+                <label>اسم المادة <input type="text" id="examSubject" /></label>
+                <label>اسم الامتحان <input type="text" id="examTitle" /></label>
+                <label>تاريخ الامتحان <input type="datetime-local" id="examDate" /></label>
+                <label>المدة (دقيقة) <input type="number" id="examDuration" min="30" max="300" /></label>
+                <label>الدرجة الكلية <input type="number" id="examTotal" min="1" max="100" /></label>
+                <label>الدرجة التي حصل عليها الطالب <input type="number" id="examScore" min="0" max="100" /></label>
+                <textarea id="examNotes" rows="3" placeholder="ملاحظات وموضوعات تحتاج مراجعة"></textarea>
+                <button type="submit" class="primary-btn">حفظ الامتحان</button>
+              </form>
+            </div>
+            <div class="card">
+              <h3>العد التنازلي</h3>
+              <div id="examsCountdown"></div>
+            </div>
+          </div>
+          <div id="examList" class="stack-list"></div>
+        </section>
+
+        <section id="focus" class="page-panel">
+          <div class="section-header">
+            <h2>مؤقت التركيز</h2>
+          </div>
+          <div class="card timer-card">
+            <div id="timerDisplay">25:00</div>
+            <div class="timer-controls">
+              <button id="focusStart" class="primary-btn">ابدأ</button>
+              <button id="focusPause" class="secondary-btn">إيقاف</button>
+              <button id="focusReset" class="ghost-btn">إعادة ضبط</button>
+            </div>
+            <div class="timer-settings">
+              <label>نوع الجلسة
+                <select id="timerMode">
+                  <option value="focus">تركيز</option>
+                  <option value="shortBreak">استراحة قصيرة</option>
+                  <option value="longBreak">استراحة طويلة</option>
+                </select>
+              </label>
+              <label>المادة <input type="text" id="timerSubject" placeholder="اللغة العربية" /></label>
+              <label>الدرس <input type="text" id="timerLesson" placeholder="البلاغة" /></label>
+            </div>
+          </div>
+          <div id="focusHistory" class="stack-list"></div>
+        </section>
+
+        <section id="review" class="page-panel">
+          <div class="section-header">
+            <h2>المراجعة والتكرار المتباعد</h2>
+          </div>
+          <div id="reviewQueue" class="stack-list"></div>
+        </section>
+
+        <section id="stats" class="page-panel">
+          <div class="section-header">
+            <h2>الإحصائيات والتقدم</h2>
+          </div>
+          <div id="statsCards" class="stats-grid"></div>
+          <div class="card">
+            <h3>معدلات إنجاز المواد</h3>
+            <div id="subjectProgress"></div>
+          </div>
+        </section>
+
+        <section id="library" class="page-panel">
+          <div class="section-header">
+            <h2>المكتبة والملفات</h2>
+          </div>
+          <div class="card">
+            <form id="sourceForm" class="stack-form">
+              <label>اسم المصدر <input type="text" id="sourceName" /></label>
+              <label>رابط أو مسار <input type="url" id="sourceUrl" placeholder="https://..." /></label>
+              <label>المادة <input type="text" id="sourceSubject" /></label>
+              <label>النوع
+                <select id="sourceType">
+                  <option value="video">فيديو</option>
+                  <option value="pdf">ملف PDF</option>
+                  <option value="note">ملاحظة</option>
+                  <option value="website">موقع</option>
+                </select>
+              </label>
+              <button type="submit" class="primary-btn">إضافة مصدر</button>
+            </form>
+          </div>
+          <div id="sourceList" class="stack-list"></div>
+        </section>
+
+        <section id="assistant" class="page-panel">
+          <div class="section-header">
+            <h2>المساعد الذكي</h2>
+          </div>
+          <div class="assistant-grid">
+            <button class="action-card" data-ai-action="plan">إنشاء خطة يومية</button>
+            <button class="action-card" data-ai-action="backlog">التعامل مع التراكم</button>
+            <button class="action-card" data-ai-action="review">اقتراح مراجعات</button>
+            <button class="action-card" data-ai-action="priority">ترتيب الأولويات</button>
+          </div>
+          <div id="assistantOutput" class="card"></div>
+        </section>
+
+        <section id="settings" class="page-panel">
+          <div class="section-header">
+            <h2>الإعدادات والنسخ الاحتياطي</h2>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <h3>إعدادات التطبيق</h3>
+              <form id="settingsForm" class="stack-form">
+                <label>مزوّد الذكاء الاصطناعي
+                  <select id="aiProvider">
+                    <option value="local">الوضع المحلي</option>
+                    <option value="mock">نموذج تجريبي</option>
+                    <option value="custom">مقدم مخصص</option>
+                  </select>
+                </label>
+                <label>رابط مزود الذكاء الاصطناعي <input type="url" id="aiEndpoint" placeholder="https://api.example.com" /></label>
+                <label>تفعيل الإشعارات داخل الموقع <input type="checkbox" id="notificationsEnabled" /></label>
+                <button type="submit" class="primary-btn">حفظ الإعدادات</button>
+              </form>
+            </div>
+
+            <div class="card">
+              <h3>النسخ الاحتياطي</h3>
+              <div class="stack-form">
+                <button id="exportDataBtn" class="primary-btn" type="button">تصدير نسخة احتياطية</button>
+                <label class="file-label">
+                  استيراد نسخة احتياطية
+                  <input id="importDataInput" type="file" accept="application/json" />
+                </label>
+                <button id="resetDataBtn" class="danger-btn" type="button">إعادة تعيين البيانات</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
